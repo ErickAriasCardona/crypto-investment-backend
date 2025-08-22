@@ -1,5 +1,5 @@
 const express = require("express");
-const { getCryptos, getGainers, getLosers, getAllCryptocurrencies, getCryptocurrencyById, getRandomCryptocurrencies, getCryptoHistoryDB, getCryptoDetail, updatePrices, getCryptoHistory }= require("../controllers/cryptoController");;
+const { getCryptos, getGainers, getLosers, getAllCryptocurrencies, getCryptocurrencyById, getRandomCryptocurrencies, getCryptoHistoryDB, getCryptoDetail, updatePrices, getCryptoHistory } = require("../controllers/cryptoController");;
 
 const router = express.Router();
 

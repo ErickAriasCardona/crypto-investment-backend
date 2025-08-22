@@ -1,8 +1,8 @@
 const cron = require('node-cron');
-const {updatePricesJob} = require( "../controllers/cryptoController");
+const { updatePricesJob } = require("../controllers/cryptoController");
 
-// Corre cada 60 minutos
-cron.schedule("*/1 * * * *", async () => {
+// Corre cada 10 minutos
+cron.schedule("*/10 * * * *", async () => {
   console.log("⏳ Actualizando precios...");
   try {
     await updatePricesJob();

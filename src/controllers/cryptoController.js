@@ -10,9 +10,7 @@ const CMC_BASE_URL = process.env.COINMARKETCAP_BASE_URL;
 const COINGECKO_BASE_URL = process.env.COINGECKO_BASE_URL;
 
 
-// ================================
 // Función para actualizar y guardar precios en BD
-// ================================
 const updatePricesJob = async (req, res) => {
     try {
         const response = await axios.get(
@@ -52,9 +50,7 @@ const updatePricesJob = async (req, res) => {
     }
 };
 
-// ================================
 // POST /cryptos/update → Actualizar precios y guardar en BD
-// ================================
 const updatePrices = async (req, res) => {
     try {
         if (!Price || !Cryptocurrency) {
@@ -67,9 +63,7 @@ const updatePrices = async (req, res) => {
     }
 };
 
-// ================================
 // GET /cryptos → Obtener lista de criptos (desde API externa)
-// ================================
 const getCryptos = async (req, res) => {
     try {
         const response = await axios.get(
@@ -87,9 +81,7 @@ const getCryptos = async (req, res) => {
     }
 };
 
-// ================================
 // GET /cryptos/:symbol → Detalle de una cripto
-// ================================
 const getCryptoDetail = async (req, res) => {
     try {
         const { symbol } = req.params;
@@ -109,13 +101,11 @@ const getCryptoDetail = async (req, res) => {
     }
 };
 
-// ================================
 // GET /cryptos/history/:id → Históricos CoinGecko
-// ================================
 const getCryptoHistory = async (req, res) => {
     try {
-        const { id } = req.params; // Ejemplo: "bitcoin"
-        const { from, to } = req.query; // timestamps UNIX
+        const { id } = req.params;
+        const { from, to } = req.query;
 
         const response = await axios.get(
             `${COINGECKO_BASE_URL}/coins/${id}/market_chart/range`,
@@ -131,9 +121,7 @@ const getCryptoHistory = async (req, res) => {
     }
 };
 
-// ================================
 // GET /cryptos/history-db/:symbol → Históricos desde BD
-// ================================
 const getCryptoHistoryDB = async (req, res) => {
     try {
         if (!Price || !Cryptocurrency) {
@@ -169,6 +157,7 @@ const getCryptoHistoryDB = async (req, res) => {
         res.status(500).json({ error: "Error al consultar históricos en la base de datos" });
     }
 };
+
 // GET /cryptos/random → 4 criptomonedas aleatorias con su último precio y percent_change_24h
 const getRandomCryptocurrencies = async (req, res) => {
     try {
@@ -217,7 +206,7 @@ const getCryptocurrencyById = async (req, res) => {
                     model: Price,
                     as: "prices",
                     order: [["date_time", "DESC"]],
-                    limit: 1, // Solo el último registro de precios
+                    limit: 1,
                 },
             ],
         });
@@ -246,15 +235,15 @@ const getAllCryptocurrencies = async (req, res) => {
                 order: [['date_time', 'DESC']],
                 attributes: [
                     'id',
-                    'price_usd', 
+                    'price_usd',
                     'volume_24h',
-                    'percent_change_24h', 
+                    'percent_change_24h',
                     'date_time'
                 ]
             }],
         });
 
-        
+
         if (!cryptocurrencies || cryptocurrencies.length === 0) {
             return res.status(404).json({
                 success: false,
@@ -265,8 +254,8 @@ const getAllCryptocurrencies = async (req, res) => {
         //Formatear los datos para incluir el último precio
         const formattedData = cryptocurrencies.map(crypto => {
             const cryptoData = crypto.toJSON();
-            const lastPrice = cryptoData.prices && cryptoData.prices.length > 0 
-                ? cryptoData.prices[0] 
+            const lastPrice = cryptoData.prices && cryptoData.prices.length > 0
+                ? cryptoData.prices[0]
                 : null;
 
             return {
@@ -301,6 +290,7 @@ const getAllCryptocurrencies = async (req, res) => {
     }
 };
 
+// Obtener los gainers por percent_change_24h
 const getGainers = async (req, res) => {
     try {
         // Obtener todas las criptomonedas con su último cambio porcentual
@@ -344,13 +334,14 @@ const getGainers = async (req, res) => {
     }
 };
 
+// Obtener los losers por percent_change_24h
 const getLosers = async (req, res) => {
     try {
         // Obtener todas las criptomonedas con su último cambio porcentual
         const cryptos = await Cryptocurrency.findAll({
             include: [{
                 model: Price,
-                as: 'prices', 
+                as: 'prices',
                 attributes: ['percent_change_24h', 'price_usd', 'date_time'],
                 order: [['date_time', 'DESC']],
                 limit: 1

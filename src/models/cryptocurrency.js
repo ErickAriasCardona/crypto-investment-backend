@@ -4,23 +4,23 @@ class Cryptocurrency extends Model {
   static init(sequelize) {
     super.init(
       {
-        id: { 
-          type: DataTypes.INTEGER, 
-          primaryKey: true, 
-          autoIncrement: true 
+        id: {
+          type: DataTypes.INTEGER,
+          primaryKey: true,
+          autoIncrement: true
         },
-        name: { 
-          type: DataTypes.STRING, 
-          allowNull: false 
+        name: {
+          type: DataTypes.STRING,
+          allowNull: false
         },
-        symbol: { 
-          type: DataTypes.STRING, 
-          allowNull: false, 
-          unique: true 
+        symbol: {
+          type: DataTypes.STRING,
+          allowNull: false,
+          unique: true
         },
-        slug: { 
-          type: DataTypes.STRING, 
-          allowNull: false 
+        slug: {
+          type: DataTypes.STRING,
+          allowNull: false
         },
       },
       {

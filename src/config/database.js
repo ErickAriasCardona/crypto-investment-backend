@@ -5,7 +5,7 @@ const DB_NAME = process.env.DB_NAME || "crypto_investment";
 const DB_USER = process.env.DB_USER || "root";
 const DB_PASSWORD = process.env.DB_PASSWORD || "";
 const DB_HOST = process.env.DB_HOST || "localhost";
-const DB_PORT = process.env.DB_PORT || 3306; 
+const DB_PORT = process.env.DB_PORT || 3306;
 const DB_URL = process.env.DB_URL;
 
 
@@ -14,9 +14,9 @@ async function createDatabaseIfNotExists() {
   try {
     // Conectar a MySQL sin seleccionar una base de datos específica
     const connection = await mysql.createConnection({
-      host: DB_HOST, 
-      user: DB_USER, 
-      password: DB_PASSWORD, 
+      host: DB_HOST,
+      user: DB_USER,
+      password: DB_PASSWORD,
     });
 
     // Crear la base de datos si no existe
@@ -26,7 +26,7 @@ async function createDatabaseIfNotExists() {
     await connection.end();
   } catch (error) {
     console.error("❌ Error al verificar/crear la base de datos:", error);
-    process.exit(1); // Detener el proceso si hay error
+    process.exit(1); 
   }
 }
 
