@@ -1,8 +1,9 @@
-import { DataTypes, Model } from "sequelize";
+const { DataTypes, Model } = require('sequelize');
+const Cryptocurrency = require('./cryptocurrency');
 
 class Price extends Model {
-  static initModel(sequelize) {
-    Price.init(
+  static init(sequelize) {
+    super.init(
       {
         id: {
           type: DataTypes.INTEGER,
@@ -24,31 +25,25 @@ class Price extends Model {
         date_time: {
           type: DataTypes.DATE,
           defaultValue: DataTypes.NOW,
-        },
-        cryptocurrencyId: {
-          type: DataTypes.INTEGER,
-          allowNull: false,
-        },
+        }
       },
       {
         sequelize,
-        modelName: "Price",
         tableName: "prices",
         timestamps: false,
       }
     );
-    return Price;
   }
 
-  static associate(models) {
+  static associate() {
     // Relación muchos a 1 con Cryptocurrency
-    this.belongsTo(models.Cryptocurrency, {
+    this.belongsTo(Cryptocurrency, {
       foreignKey: "cryptocurrencyId",
-      as: "cryptocurrency",
+      as: "cryptocurrencies",
       onDelete: "CASCADE",
       onUpdate: "CASCADE",
     });
   }
 }
 
-export default Price;
+module.exports = Price;

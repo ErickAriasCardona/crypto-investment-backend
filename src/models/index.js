@@ -1,21 +1,23 @@
-import { Sequelize } from "sequelize";
-import dotenv from "dotenv";
-import createDatabaseIfNotExists from "../config/database.js";
-import Cryptocurrency from "./cryptocurrency.js";
-import Price from "./price.js";
+const { Sequelize } = require("sequelize");
+const createDatabaseIfNotExists = require("../config/database");
+require('dotenv').config();
 
-// Cargar variables de entorno
-dotenv.config();
+// Importar modelos
+const Cryptocurrency = require("./cryptocurrency.js");
+const Price = require("./price.js");
 
 // Leer la URL de conexión (recomendada en producción)
 const DB_URL = process.env.DB_URL;
 
 // Alternativamente, datos individuales (útiles en desarrollo local)
-const DB_NAME = process.env.DB_NAME || "formacion_complementaria";
+const DB_NAME = process.env.DB_NAME || "crypto_investment";
 const DB_USER = process.env.DB_USER || "root";
 const DB_PORT = process.env.DB_PORT || 3306; // Puerto por defecto de MySQL
 const DB_PASSWORD = process.env.DB_PASSWORD || "";
 const DB_HOST = process.env.DB_HOST || "localhost";
+
+// ✅ Variable global para almacenar la instancia de la base de datos
+let dbInstance = null;
 
 async function initializeDatabase() {
   let sequelize;
@@ -32,7 +34,6 @@ async function initializeDatabase() {
       logging: false,
     });
   } else {
-
     // Desarrollo local: crear base de datos si no existe
     await createDatabaseIfNotExists();
 
@@ -53,28 +54,59 @@ async function initializeDatabase() {
     process.exit(1);
   }
 
-  // Inicializar los modelos...
-  Cryptocurrency.initModel(sequelize);
-  Price.initModel(sequelize);
+  // Inicializar los modelos
+  Cryptocurrency.init(sequelize);
+  Price.init(sequelize);
 
-  Cryptocurrency.associate({ Price });
-  Price.associate({ Cryptocurrency });
-
-  // Colección de modelos
+  // Crear objeto de modelos
   const models = {
     Cryptocurrency,
-    Price
+    Price,
+    sequelize // ✅ También incluimos sequelize para queries directas si es necesario
   };
 
+  // Asociaciones de modelos
+  Object.values(models).forEach((model) => {
+    if (model.associate) model.associate(models);
+  });
 
   // Sincronizar tablas
   await sequelize.sync({ force: false });
   console.log("📂 Tablas sincronizadas con la base de datos.");
 
-  return {
+  // ✅ Guardar la instancia globalmente
+  dbInstance = {
     sequelize,
     ...models
   };
+
+  return dbInstance;
 }
 
-export default initializeDatabase;
+// ✅ Función para obtener la instancia de la base de datos inicializada
+function getDB() {
+  if (!dbInstance) {
+    throw new Error("❌ Base de datos no inicializada. Asegúrate de llamar a initializeDatabase() primero.");
+  }
+  return dbInstance;
+}
+
+// ✅ Función para obtener solo los modelos (sin sequelize)
+function getModels() {
+  const db = getDB();
+  const { sequelize, ...models } = db;
+  return models;
+}
+
+// ✅ Función para obtener solo sequelize
+function getSequelize() {
+  const db = getDB();
+  return db.sequelize;
+}
+
+module.exports = { 
+  initializeDatabase, 
+  getDB, 
+  getModels, 
+  getSequelize 
+};
