@@ -1,13 +1,15 @@
-import  mysql from "mysql2/promise";
+const mysql = require("mysql2/promise");
 
-// Datos de conexión (ajústalos según tu configuración)
+// Datos de conexión
 const DB_NAME = process.env.DB_NAME || "crypto_investment";
 const DB_USER = process.env.DB_USER || "root";
 const DB_PASSWORD = process.env.DB_PASSWORD || "";
 const DB_HOST = process.env.DB_HOST || "localhost";
-const DB_PORT = process.env.DB_PORT || 3306; // Puerto por defecto de MySQL
+const DB_PORT = process.env.DB_PORT || 3306; 
 const DB_URL = process.env.DB_URL;
 
+
+//crear la base de datos local sino existe
 async function createDatabaseIfNotExists() {
   try {
     // Conectar a MySQL sin seleccionar una base de datos específica
@@ -28,4 +30,4 @@ async function createDatabaseIfNotExists() {
   }
 }
 
-export default createDatabaseIfNotExists;
+module.exports = createDatabaseIfNotExists;
