@@ -301,10 +301,99 @@ const getAllCryptocurrencies = async (req, res) => {
     }
 };
 
+const getGainers = async (req, res) => {
+    try {
+        // Obtener todas las criptomonedas con su último cambio porcentual
+        const cryptos = await Cryptocurrency.findAll({
+            include: [{
+                model: Price,
+                as: 'prices',
+                attributes: ['percent_change_24h', 'price_usd', 'date_time'],
+                order: [['date_time', 'DESC']],
+                limit: 1
+            }]
+        });
+
+        // Filtrar las que tienen datos de precio y ordenar por percent_change_24h
+        const sortedCryptos = cryptos
+            .filter(crypto => crypto.prices && crypto.prices.length > 0)
+            .sort((a, b) => b.prices[0].percent_change_24h - a.prices[0].percent_change_24h);
+
+        // Tomar la primera mitad (gainers)
+        const gainersCount = Math.ceil(sortedCryptos.length / 2);
+        const gainers = sortedCryptos.slice(0, gainersCount);
+
+        // Formatear respuesta
+        const formattedGainers = gainers.map(crypto => ({
+            id: crypto.id,
+            name: crypto.name,
+            symbol: crypto.symbol,
+            price_usd: crypto.prices[0].price_usd,
+            percent_change_24h: crypto.prices[0].percent_change_24h,
+            last_updated: crypto.prices[0].date_time
+        }));
+
+        res.json({
+            count: formattedGainers.length,
+            data: formattedGainers
+        });
+
+    } catch (error) {
+        console.error("❌ Error en getGainers:", error.message);
+        res.status(500).json({ error: "Error al obtener gainers" });
+    }
+};
+
+const getLosers = async (req, res) => {
+    try {
+        // Obtener todas las criptomonedas con su último cambio porcentual
+        const cryptos = await Cryptocurrency.findAll({
+            include: [{
+                model: Price,
+                as: 'prices', 
+                attributes: ['percent_change_24h', 'price_usd', 'date_time'],
+                order: [['date_time', 'DESC']],
+                limit: 1
+            }]
+        });
+
+        // Filtrar las que tienen datos de precio y ordenar por percent_change_24h
+        const sortedCryptos = cryptos
+            .filter(crypto => crypto.prices && crypto.prices.length > 0)
+            .sort((a, b) => a.prices[0].percent_change_24h - b.prices[0].percent_change_24h);
+
+        // Tomar la primera mitad (losers)
+        const losersCount = Math.ceil(sortedCryptos.length / 2);
+        const losers = sortedCryptos.slice(0, losersCount);
+
+        // Formatear respuesta
+        const formattedLosers = losers.map(crypto => ({
+            id: crypto.id,
+            name: crypto.name,
+            symbol: crypto.symbol,
+            price_usd: crypto.prices[0].price_usd,
+            percent_change_24h: crypto.prices[0].percent_change_24h,
+            last_updated: crypto.prices[0].date_time
+        }));
+
+        res.json({
+            count: formattedLosers.length,
+            data: formattedLosers
+        });
+
+    } catch (error) {
+        console.error("❌ Error en getLosers:", error.message);
+        res.status(500).json({ error: "Error al obtener losers" });
+    }
+};
+
+
 module.exports = {
     getCryptos,
     getCryptoDetail,
     getCryptoHistory,
+    getGainers,
+    getLosers,
     getCryptoHistoryDB,
     getRandomCryptocurrencies,
     updatePrices,
