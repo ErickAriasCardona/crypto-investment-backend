@@ -16,7 +16,7 @@ const DB_PORT = process.env.DB_PORT || 3306; // Puerto por defecto de MySQL
 const DB_PASSWORD = process.env.DB_PASSWORD || "";
 const DB_HOST = process.env.DB_HOST || "localhost";
 
-// ✅ Variable global para almacenar la instancia de la base de datos
+// Variable global para almacenar la instancia de la base de datos
 let dbInstance = null;
 
 async function initializeDatabase() {
@@ -34,6 +34,7 @@ async function initializeDatabase() {
       logging: false,
     });
   } else {
+
     // Desarrollo local: crear base de datos si no existe
     await createDatabaseIfNotExists();
 
@@ -62,7 +63,7 @@ async function initializeDatabase() {
   const models = {
     Cryptocurrency,
     Price,
-    sequelize // ✅ También incluimos sequelize para queries directas si es necesario
+    sequelize
   };
 
   // Asociaciones de modelos
@@ -74,7 +75,7 @@ async function initializeDatabase() {
   await sequelize.sync({ force: false });
   console.log("📂 Tablas sincronizadas con la base de datos.");
 
-  // ✅ Guardar la instancia globalmente
+  //Guardar la instancia globalmente
   dbInstance = {
     sequelize,
     ...models
@@ -83,7 +84,7 @@ async function initializeDatabase() {
   return dbInstance;
 }
 
-// ✅ Función para obtener la instancia de la base de datos inicializada
+// Función para obtener la instancia de la base de datos inicializada
 function getDB() {
   if (!dbInstance) {
     throw new Error("❌ Base de datos no inicializada. Asegúrate de llamar a initializeDatabase() primero.");
@@ -91,22 +92,22 @@ function getDB() {
   return dbInstance;
 }
 
-// ✅ Función para obtener solo los modelos (sin sequelize)
+// Función para obtener solo los modelos (sin sequelize)
 function getModels() {
   const db = getDB();
   const { sequelize, ...models } = db;
   return models;
 }
 
-// ✅ Función para obtener solo sequelize
+// Función para obtener solo sequelize
 function getSequelize() {
   const db = getDB();
   return db.sequelize;
 }
 
-module.exports = { 
-  initializeDatabase, 
-  getDB, 
-  getModels, 
-  getSequelize 
+module.exports = {
+  initializeDatabase,
+  getDB,
+  getModels,
+  getSequelize
 };

@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require("express");
 const cors = require("cors");
-const { initializeDatabase } = require("./src/models/index"); // ✅ Destructuring
+const { initializeDatabase } = require("./src/models/index");
 const cryptoRoutes = require("./src/routes/cryptoRoutes");
 const { updatePricesJob } = require("./src/controllers/cryptoController");
 require("./src/jobs/updatePrices");
@@ -20,10 +20,10 @@ app.use("/cryptos", cryptoRoutes);
 
 async function startServer() {
   try {
-    // ✅ Inicializar base de datos y guardar modelos globalmente
+    // Inicializar base de datos y guardar modelos globalmente
     const db = await initializeDatabase();
-    
-    // ✅ Hacer los modelos disponibles globalmente (opcional)
+
+    // Hacer los modelos disponibles globalmente (opcional)
     global.db = db;
 
     console.log("⏳ Actualizando precios iniciales...");
